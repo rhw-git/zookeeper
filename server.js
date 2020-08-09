@@ -60,5 +60,3 @@ app.get("/api/animals", (req, res) => {
   }
   res.json(results);
 });
-
-// filterByQuery();
