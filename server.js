@@ -6,7 +6,7 @@ app.listen(PORT, () => {
   console.log(`API server now on port ${PORT}!`);
 });
 
-const { animals } = require("./data/animals");
+const { animals } = require("./data/animals.json");
 
 function filterByQuery(query, animalsArray) {
   let personalityTraitsArray = [];
