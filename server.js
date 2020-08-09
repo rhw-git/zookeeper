@@ -1,12 +1,19 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.listen(PORT, () => {
   console.log(`API server now on port ${PORT}!`);
 });
+// parse incoming string or array data
+app.use(express.urlencoded({ extended: true }));
+// parse incoming JSON data
+app.use(express.json());
 
 const { animals } = require("./data/animals.json");
+//const { fstat } = require("fs");
 
 function filterByQuery(query, animalsArray) {
   let personalityTraitsArray = [];
@@ -37,7 +44,7 @@ function filterByQuery(query, animalsArray) {
 
   if (query.diet) {
     filteredResults = filteredResults.filter(
-      (animal) => amimal.diet === query.diet
+      (animal) => animal.diet === query.diet
     );
   }
   if (query.species) {
@@ -58,6 +65,31 @@ function findById(id, animalsArray) {
   return result;
 }
 
+function createNewAnimal(body, animalsArray) {
+  const animal = body;
+  animalsArray.push(animal);
+  fs.writeFileSync(
+    path.join(__dirname, "./data/animals.json"),
+    JSON.stringify({ animals: animalsArray }, null, 2)
+  );
+  return animal;
+}
+
+function validateAnimal(animal) {
+  if (!animal.name || typeof animal.name !== "string") {
+    return false;
+  }
+  if (!animal.species || typeof animal.species !== "string") {
+    return false;
+  }
+  if (!animal.diet || typeof animal.diet !== "string") {
+    return false;
+  }
+  if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
+    return false;
+  }
+}
+
 app.get("/api/animals", (req, res) => {
   let results = animals;
   if (req.query) {
@@ -72,5 +104,17 @@ app.get("/api/animals/:id", (req, res) => {
     res.json(result);
   } else {
     res.send(404);
+  }
+});
+
+app.post("/api/animals", (req, res) => {
+  // set id based on what the next index of the array will be
+  req.body.id = animals.length.toString();
+  // if any data in req.body is incoreect, send 400 error back
+  if (!validateAnimal(req.body)) {
+    res.status(400).send("The animal is not properly formatted.");
+  } else {
+    const animal = createNewAnimal(req.body, animals);
+    res.json(req.body);
   }
 });
