@@ -153,6 +153,15 @@
         "anxious"
       ],
       "id": "15"
+    },
+    {
+      "name": "Tom",
+      "species": "Lemur",
+      "diet": "omnivore",
+      "personalityTraits": [
+        "hungry"
+      ],
+      "id": "16"
     }
   ]
 }
